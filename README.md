@@ -19,6 +19,6 @@ Open [`Sudoku_CLI/Sudoku_CLI.sln`](Sudoku_CLI/Sudoku_CLI.sln) in [Visual Studio]
 
 ## License
 
-Copyright (C) 2021 Simik31. All rights reserved.
+Copyright &copy; 2021 Simik31. All rights reserved.
 
 Licensed under the [WTFPL License](LICENSE).
