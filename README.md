@@ -15,7 +15,7 @@ Get the code:
     git clone https://github.com/Simik31/Sudoku_CLI.git
 ```
 
-Open [`Sudoku_CLI/Sudoku_CLI.sln`](Sudoku_CLI/Sudoku_CLI.sln) in [Visual Studio](https://visualstudio.microsoft.com/ "Get Visual Studio") to build and run the project.
+Open [`Sudoku_CLI.sln`](Sudoku_CLI.sln) in [Visual Studio](https://visualstudio.microsoft.com/ "Get Visual Studio") to build and run the project.
 
 ## License
 
