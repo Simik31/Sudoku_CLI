@@ -1,5 +1,5 @@
-# Sudoku_CLI
-Simple CLI Sudoku
+# Sudoku CLI
+Simple CLI (Command Line Interface) Sudoku
 
 C++ 20 Standard
 
