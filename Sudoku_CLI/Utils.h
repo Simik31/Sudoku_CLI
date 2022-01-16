@@ -4,11 +4,13 @@
 
 #define SET_COLOR(color) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color)
 #define WRAP(num) (((num) % 9 + 9) % 9)
-#define MOVE_CURSOR_TO_CELL(x, y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), COORD{ short(x * 2 + 1), short(y * 2 + 1) })
 
 #include <iostream>
+#include <iomanip>
+#include <locale>
 #include <Windows.h>
 #include <string>
+#include <stdio.h>
 #include <vector>
 #include <fstream>
 #include <filesystem>
@@ -18,9 +20,13 @@
 class Utils
 {
 public:
-	static void print_sudoku(const Sudoku& sudoku);
-	static void highlight_cell(Sudoku& sudoku, const int x, const int y);
-	static std::vector<std::string> read_lines_from_file(const std::string& filename);
+	static void print_sudoku(const Sudoku& sudoku, const bool cls = true);
+	static void highlight_cell(Sudoku& sudoku, const COORD& cursor);
+	static void read_lines_from_file(const std::string& filename, std::vector<std::string>& lines);
+	static void move_cursor(const COORD& cursor);
+	static std::string ms_to_timestamp(const double& millis);
+	static void highlight_mistakes(Sudoku& sudoku);
+	static std::string format_comas(const double& value, const int precision);
 };
 
 #endif

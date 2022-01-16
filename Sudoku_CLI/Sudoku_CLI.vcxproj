@@ -141,12 +141,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BetterBruteForce.cpp" />
+    <ClCompile Include="BruteForce.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Sudoku.cpp" />
     <ClCompile Include="Sudoku_CLI.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BetterBruteForce.h" />
+    <ClInclude Include="BruteForce.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Sudoku.h" />
     <ClInclude Include="Utils.h" />

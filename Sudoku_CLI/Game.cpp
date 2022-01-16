@@ -2,22 +2,19 @@
 
 void Game::main_menu()
 {
-    int choice;
     do
     {
         system("cls");
-        std::cout << "Welcome at SUDOKU CLI game.\nCopyright (C) 2021: Simik31 / https://github.com/Simik31/Sudoku_CLI / simik31@pm.me \n\n[1] Input sudoku by hand\n[2] Load sudoku from file\n[3] Load 'default' sudoku\n\n > ";
-        choice = std::cin.get() - 48;
-    } while (choice < 1 || choice > 3);
+        std::cout << "Welcome at SUDOKU CLI game.\nCopyright (C) 2021: Simik31 / https://github.com/Simik31/Sudoku_CLI / simik31@pm.me \n\n[1] Input sudoku by hand\n[2] Load sudoku from file\n[3] Load 'default' sudoku\n\n[5] Input sudoku by hand & Brute Force solve\n[6] Load sudoku from file & Brute Force solve\n[7] Load 'default' sudoku & Brute Force solve\n\n > ";
+        this->mm_choice = std::cin.get() - '0';
+    } while (this->mm_choice < 1 || this->mm_choice > 7 || this->mm_choice == 4);
 
     while (!this->loaded)
     {
-        switch (choice)
-        {
-            case 1: this->load_by_hand(); break;
-            case 2: this->load_from_file(); break;
-            case 3: this->load_default(); break;
-        }
+        if (this->mm_choice == 1 || this->mm_choice == 5) this->load_by_hand();
+        if (this->mm_choice == 2 || this->mm_choice == 6) this->load_from_file();
+        if (this->mm_choice == 3 || this->mm_choice == 7) this->load_default();
+
         if (!this->loaded)
         {
             std::cout << "Press any key to repeat...";
@@ -26,8 +23,23 @@ void Game::main_menu()
     }
 }
 
+void Game::run()
+{
+    if (!this->loaded)
+    {
+        std::cerr << "No sudoku loaded somehow..." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    if (this->mm_choice < 4)
+        this->solve_player();
+    else
+        this->solve_brute_force();
+}
+
 void Game::load_by_hand()
 {
+    system("cls");
     std::cout << "Enter sudoku by using arrows to navigate into cell and pressing corresponding number.\nWhen you are done enetering numbers, press Enter to start solving.\n\nPress any key to strart...";
     _getch();
 
@@ -37,30 +49,26 @@ void Game::load_by_hand()
 
     while (true)
     {
-        int fill = -1;
+        std::vector<int> init;
+        init.reserve(81);
 
-        MOVE_CURSOR_TO_CELL(this->cursor_x, this->cursor_y);
+        Utils::move_cursor(this->cursor);
 
         int in = _getch();
-        switch (in)
+
+        if (in == KEY_UP) this->cursor.Y = WRAP(this->cursor.Y - 1);
+        else if (in == KEY_RIGHT) this->cursor.X = WRAP(this->cursor.X + 1);
+        else if (in == KEY_DOWN) this->cursor.Y = WRAP(this->cursor.Y + 1);
+        else if (in == KEY_LEFT) this->cursor.X = WRAP(this->cursor.X - 1);
+        else if (in == KEY_ENTER)
         {
-            case KEY_ENTER: 
-            {
-                std::vector<int> init;
-                init.reserve(81);
-
-                for (int i = 0; i < 81; i++) init.push_back(Sudoku::get_state(tmp, i));
-
-                this->loaded = true;
-
-                return Utils::print_sudoku(this->sudoku = Sudoku(init));
-            };
-            case KEY_UP: this->cursor_y = WRAP(this->cursor_y - 1); break;
-            case KEY_RIGHT: this->cursor_x = WRAP(this->cursor_x + 1); break;
-            case KEY_DOWN: this->cursor_y = WRAP(this->cursor_y + 1); break;
-            case KEY_LEFT: this->cursor_x = WRAP(this->cursor_x - 1); break;
-            default: if (in >= 49 && in <= 57) tmp.fill_number(this->cursor_x, this->cursor_y, in - 48); // 49 = 1, 50 = 2, ... 57 = 9
-        }            
+            for (int y = 0; y < 9; y++) for (int x = 0; x < 9; x++) init.push_back(Sudoku::get_state(tmp, COORD{short(x), short(y)}));
+            this->sudoku = Sudoku(init);
+            Utils::print_sudoku(this->sudoku);
+            this->loaded = true;
+            return;
+        }
+        else if (in >= '1' && in <= '9') tmp.fill_number(this->cursor, in - '0');
     }
 }
 
@@ -71,11 +79,12 @@ void Game::load_from_file()
     std::string path;
     std::cin >> path;
 
-    std::vector<std::string> file_lines = Utils::read_lines_from_file(path);
+    std::vector<std::string> file_lines;
+    Utils::read_lines_from_file(path, file_lines);
 
     if (file_lines.size() == 0)
     {
-        std::cerr << "File not found or empty: " << std::filesystem::absolute(path) << std::endl;
+        std::cerr << "File is empty: " << std::filesystem::absolute(path) << std::endl;
         return;
     }
     else if (file_lines.size() != 9)
@@ -98,9 +107,7 @@ void Game::load_from_file()
     std::vector<int> init;
     init.reserve(81);
 
-    for (std::string line : file_lines)
-        for (char c : line)
-            init.push_back(c - '0');
+    for (std::string line : file_lines) for (char c : line) init.push_back(c - '0');
 
     this->sudoku = Sudoku(init);
     this->loaded = true;
@@ -127,31 +134,42 @@ void Game::load_default()
     this->loaded = true;
 }
 
-void Game::run()
+void Game::solve_player()
 {
-    if (!loaded) return;
-
     Utils::print_sudoku(this->sudoku);
 
     while (!this->sudoku.is_solved())
     {
-        int fill = -1;
-
-        MOVE_CURSOR_TO_CELL(this->cursor_x, this->cursor_y);
+        Utils::move_cursor(this->cursor);
 
         int in = _getch();
-        switch (in)
-        {
-        case KEY_UP: this->cursor_y = WRAP(this->cursor_y - 1); break;
-        case KEY_RIGHT: this->cursor_x = WRAP(this->cursor_x + 1); break;
-        case KEY_DOWN: this->cursor_y = WRAP(this->cursor_y + 1); break;
-        case KEY_LEFT: this->cursor_x = WRAP(this->cursor_x - 1); break;
-        default: if (in >= 49 && in <= 57)
-            {
-                this->sudoku.fill_number(this->cursor_x, this->cursor_y, in - 48); // 49 = 1, 50 = 2, ... 57 = 9
-                this->sudoku.test_if_solved();
-            }
-        }
 
+        if (in == KEY_UP) this->cursor.Y = WRAP(this->cursor.Y - 1);
+        else if (in == KEY_RIGHT) this->cursor.X = WRAP(this->cursor.X + 1);
+        else if (in == KEY_DOWN) this->cursor.Y = WRAP(this->cursor.Y + 1);
+        else if (in == KEY_LEFT) this->cursor.X = WRAP(this->cursor.X - 1);
+        else if (in >= '1' && in <= '9')
+        {
+            this->sudoku.fill_number(this->cursor, in - '0');
+            this->sudoku.test_if_solved();
+        }
     }
+}
+
+void Game::solve_brute_force()
+{
+    int algo;
+
+    do
+    {
+        system("cls");
+        std::cout << "Select Brute Force algorithm \n\n[1] 'Stupid' algo - nonillions of universe age to solve!\n[2] Better algo - like under tenth of a second to solve\n\n > ";
+        algo = std::cin.get() - '0';
+    } while (algo < 1 || algo > 2);
+
+    if (algo == 1)
+        BruteForce{ this->sudoku }.solve();
+    else
+        BetterBruteForce{ this->sudoku }.solve();
+
 }

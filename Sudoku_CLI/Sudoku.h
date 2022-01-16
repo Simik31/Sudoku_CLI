@@ -3,6 +3,7 @@
 #define SUDOKU_H
 
 #include <vector>
+#include <Windows.h>
 
 class Sudoku
 {
@@ -11,10 +12,12 @@ public:
 	Sudoku(const std::vector<int>& initial_state);
 
 	bool is_solved();
-	static int get_state(const Sudoku& sudoku, const int index);
-	static bool get_initial(const Sudoku& sudoku, const int index);
+	bool is_filled();
+	int increment(const COORD& coord, const int value = 1, const bool cls = true);
+	static int get_state(const Sudoku& sudoku, const COORD& cursor);
+	static bool get_initial(const Sudoku& sudoku, const COORD& cursor);
 
-	void fill_number(const int cell_x, const int cell_y, const int number);
+	void fill_number(const COORD& cursor, const int number, const bool update = true);
 	void test_if_solved();
 
 private:

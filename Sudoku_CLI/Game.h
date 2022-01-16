@@ -13,6 +13,8 @@
 #include <conio.h>
 #include <string>
 
+#include "BruteForce.h"
+#include "BetterBruteForce.h"
 #include "Sudoku.h"
 #include "Utils.h"
 
@@ -27,9 +29,13 @@ private:
 	void load_from_file();
 	void load_default();
 
+	void solve_player();
+	void solve_brute_force();
+
+	int mm_choice;
 	bool loaded = false;
 	Sudoku sudoku;
-	int cursor_x = 0, cursor_y = 0;
+	COORD cursor{ 0, 0 };
 };
 
 #endif
